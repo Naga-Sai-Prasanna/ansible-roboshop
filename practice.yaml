@@ -1,0 +1,77 @@
+# - name: create ec2 instance
+#   hosts: local
+#   connection: local
+#   become: yes
+#   vars:
+#    sg_id: ur sg id
+#    ami_id: ur ami id
+#    env: dev
+#    domain_name: prasanna.fun
+#    action: create
+
+#   tasks:
+#   - name: ec2 creation
+#     amazon.aws.ec2_instance:
+#      instance_type: "t3.micro"
+#      security_group:  "{{ sg_id }}"
+#      image_id: "{{ ami_id }}"
+#      tags:
+#       Project: roboshop
+#       Environment: "{{ env }}"
+#       Component: "{{ item }}"
+#       instances:
+#       - mongodb
+#       - catalogue
+#       name: "{{ item }}-{{ env }}"
+#     loop: "{{ instances}}"
+#     register: "{{ ec2_output}}"
+#     when: action == create
+
+#   - name: take op
+#     ansible.builtin.debug:
+#      msg: "{{ ec2_output }}"
+
+#   - name: r53
+#     amazon.aws.route53:
+#      state: present
+#      zone: "{{ domain_name }}"
+#      ttl: 1
+#      type: A
+#      record: "{{ item.item }}-{{ env }}.{{ domain_name }}"
+#      value: "{{ item.instances[0].private_ip_adddress }}"
+#     loop: "{{ ec2_output.results }}"
+#     when: action == "create"
+
+#   - name: r53
+#     amazon.aws.route53:
+#      state: present
+#      ttl: 1
+#      type: A
+#      record_name: "Roboshop-{{ env }}.{{ domain_name }}"
+#      value: "{{ item.instances[*].public_ip_adddress }}"
+#     loop: "{{ ec2_output.results }}"
+#     when: 
+#     - action == destroy   
+#     - item.item  == "frontend"
+
+
+
+#   - name: r53 destroy
+#      amazon.aws.route53:
+#       state: absent
+#       ttl: 1
+#       type: A
+#       record_name: "{{ item.item }}-{{ env }}.{{ domain_name }}"
+#       when: action == "destroy"
+
+
+#   - name: ec2 creation
+#     amazon.aws.ec2_instance:
+#      state: absent
+#      name: "{{ item }}-{{ env }}"
+#     loop: "{{ instances}}" 
+#     when: action == "destroy"  
+
+  
+
+     
